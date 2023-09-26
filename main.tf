@@ -20,6 +20,9 @@ module "cluster" {
   tags                      = local.config.tags
   cluster_enabled_log_types = try(local.config.cluster_enabled_log_types, [""])
   aws_availability_zones    = try(local.config.aws_availability_zones, [""])
+  iam_role_additional_policies = { 
+        AmazonEBSCSIDriverPolicy = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy" 
+    } 
 }
 
 #module "kubernetes" {

@@ -4,8 +4,6 @@ data "aws_iam_policy" "ebs_csi_policy" {
 
 data "aws_eks_cluster" "eks" {
   name = local.config.cluster_name
-  kubernetes_version = local.config.cluster_version
-  most_recent        = true
   depends_on = [module.cluster]
 }
 
@@ -63,7 +61,8 @@ module "irsa-ebs-csi" {
 resource "aws_eks_addon" "ebs-csi" {
   cluster_name             = local.config.cluster_name
   addon_name               = "aws-ebs-csi-driver"
-  addon_version            = data.aws_eks_cluster.latest.version
+  addon_version            = "v5.17.0"
+  
   service_account_role_arn = module.irsa-ebs-csi.iam_role_arn
   tags = {
     "eks_addon" = "ebs-csi"

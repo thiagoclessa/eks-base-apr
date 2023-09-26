@@ -62,6 +62,7 @@ resource "aws_eks_addon" "ebs-csi" {
   cluster_name             = local.config.cluster_name
   addon_name               = "aws-ebs-csi-driver"
   service_account_role_arn = module.irsa-ebs-csi.iam_role_arn
+  resolve_conflicts_on_create = "OVERWRITE"
   tags = {
     "eks_addon" = "ebs-csi"
     "terraform" = "true"

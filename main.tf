@@ -2,6 +2,10 @@ data "aws_iam_policy" "ebs_csi_policy" {
   arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
 }
 
+data "aws_eks_cluster" "eks" {
+  name = local.name
+}
+
 module "cluster" {
   source  = "gitlab.com/vkpr/terraform-aws-eks/aws"
   version = "~> 1.3.0"
@@ -47,7 +51,7 @@ module "irsa-ebs-csi" {
   version = "4.7.0"
 
   create_role                   = true
-  role_name                     = "AmazonEKSTFEBSCSIRole-$local.config.cluster_name"
+  role_name                     = "AmazonEKSTFEBSCSIRole-${local.name}"
   provider_url                  = replace(data.aws_eks_cluster.eks.identity.0.oidc.0.issuer, "https://", "")
   role_policy_arns              = [data.aws_iam_policy.ebs_csi_policy.arn]
   oidc_fully_qualified_subjects = ["system:serviceaccount:kube-system:ebs-csi-controller-sa"]

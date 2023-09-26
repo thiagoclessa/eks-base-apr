@@ -1,5 +1,5 @@
 ---
-cluster_name: eks-base-apr-2
+cluster_name: eks-base-apr-3
 cluster_version: "1.27"
 cidr_block: 10.50.0.0/16
 private_subnets:

@@ -2,6 +2,10 @@ data "aws_iam_policy" "ebs_csi_policy" {
   arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
 }
 
+data "aws_eks_cluster" "eks" {
+  name = local.config.cluster_name
+}
+
 module "cluster" {
   source  = "gitlab.com/vkpr/terraform-aws-eks/aws"
   version = "~> 1.3.0"

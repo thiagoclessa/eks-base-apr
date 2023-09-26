@@ -1,3 +1,11 @@
+data "aws_iam_policy" "ebs_csi_policy" {
+  arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+}
+
+data "aws_eks_cluster" "eks" {
+  name = local.config.cluster_name
+}
+
 module "cluster" {
   source  = "gitlab.com/vkpr/terraform-aws-eks/aws"
   version = "~> 1.3.0"
@@ -13,31 +21,31 @@ module "cluster" {
   aws_availability_zones    = try(local.config.aws_availability_zones, [""])
 }
 
-#module "kubernetes" {
-#  source  = "gitlab.com/vkpr/terraform-kubernetes-rbac/kubernetes"
-#  version = "~> 1.1.0"
+module "kubernetes" {
+  source  = "gitlab.com/vkpr/terraform-kubernetes-rbac/kubernetes"
+  version = "~> 1.1.0"
 
-#  users_list             = local.config.users_list
-#  cluster_endpoint       = module.cluster.cluster_endpoint
-#  cluster_ca_certificate = module.cluster.cluster_certificate_authority_data
-#  cluster_access_token   = module.cluster.kubeconfig_token
-#
-#  depends_on = [module.cluster]
-#}
+  users_list             = local.config.users_list
+  cluster_endpoint       = module.cluster.cluster_endpoint
+  cluster_ca_certificate = module.cluster.cluster_certificate_authority_data
+  cluster_access_token   = module.cluster.kubeconfig_token
 
-#module "kubeconfig" {
-#  source  = "gitlab.com/vkpr/terraform-kubernetes-kubeconfig/kubernetes"
-#  version = "~> 1.1.0"
+  depends_on = [module.cluster]
+}
 
-#  users_list             = local.config.users_list
-#  cluster_name           = local.config.cluster_name
-#  cluster_endpoint       = module.cluster.cluster_endpoint
-#  cluster_ca_certificate = module.cluster.cluster_certificate_authority_data
-#  cluster_access_token   = module.kubernetes.secrets_access_tokens
-#
-#  depends_on = [module.cluster]
-#}
+module "kubeconfig" {
+  source  = "gitlab.com/vkpr/terraform-kubernetes-kubeconfig/kubernetes"
+  version = "~> 1.1.0"
 
+  users_list             = local.config.users_list
+  cluster_name           = local.config.cluster_name
+  cluster_endpoint       = module.cluster.cluster_endpoint
+  cluster_ca_certificate = module.cluster.cluster_certificate_authority_data
+  cluster_access_token   = module.kubernetes.secrets_access_tokens
+
+  depends_on = [module.kubernetes]
+}
+    
 data "aws_eks_cluster" "cluster" {
   name = local.config.cluster_name
   depends_on = [module.cluster]  
@@ -78,6 +86,5 @@ resource "aws_eks_addon" "ebs-csi" {
   tags = {
     "eks_addon" = "ebs-csi"
     "terraform" = "true"
-    "origem"    = "platform"
   }
 }

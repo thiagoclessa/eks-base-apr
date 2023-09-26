@@ -4,6 +4,7 @@ data "aws_iam_policy" "ebs_csi_policy" {
 
 data "aws_eks_cluster" "eks" {
   name = local.config.cluster_name
+  depends_on = [module.cluster] 
 }
 
 module "cluster" {

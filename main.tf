@@ -78,5 +78,5 @@ resource "kubectl_manifest" "storageclass" {
      encrypted: "true"
      tags: "vkpr=true, terraform=true"  # Add tags here
 YAML
-  depends_on = [module.kubectl]
+  depends_on = [module.cluster]
 }

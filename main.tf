@@ -68,12 +68,12 @@ resource "kubectl_manifest" "storageclass" {
    apiVersion: storage.k8s.io/v1
    kind: StorageClass
    metadata:
-     name: ebs-sc
+     name: gp3
    provisioner: ebs.csi.aws.com
    parameters:
      csi.storage.k8s.io/provisioner-secret-name: aws-secret
      csi.storage.k8s.io/provisioner-secret-namespace: kube-system
-     type: gp2
+     type: gp3
      fsType: ext4
      encrypted: "true"
      tags: "vkpr=true, terraform=true"  # Add tags here

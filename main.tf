@@ -46,7 +46,7 @@ module "irsa-ebs-csi" {
 
   create_role                   = true
   role_name                     = "AmazonEKSTFEBSCSIRole-Platform"
-  provider_url                  = replace(data.aws_eks_cluster.eks.identity.0.oidc.0.issuer, "https://", "")
+  provider_url                  = replace(data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer, "https://", "")
   role_policy_arns              = [data.aws_iam_policy.ebs_csi_policy.arn]
   oidc_fully_qualified_subjects = ["system:serviceaccount:kube-system:ebs-csi-controller-sa"]
   depends_on = [module.cluster]  

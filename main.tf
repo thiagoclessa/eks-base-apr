@@ -68,7 +68,6 @@ provider "kubectl" {
   cluster_ca_certificate = module.cluster.cluster_certificate_authority_data
   token                  = module.cluster.kubeconfig_token
   load_config_file       = false
-  depends_on = [module.cluster]
 }
 
 resource "kubectl_manifest" "storageclass" {

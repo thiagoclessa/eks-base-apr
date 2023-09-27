@@ -64,7 +64,7 @@ resource "aws_eks_addon" "ebs-csi" {
 }
 
 resource "kubectl_manifest" "storageclass" {
-    yaml_body = <<YAML
+     yaml_body = <<YAML
    apiVersion: storage.k8s.io/v1
    kind: StorageClass
    metadata:

@@ -73,7 +73,6 @@ resource "kubectl_manifest" "storageclass" {
    parameters:
      csi.storage.k8s.io/provisioner-secret-name: aws-secret
      csi.storage.k8s.io/provisioner-secret-namespace: kube-system
-     storageclass.kubernetes.io/is-default-class: true
      type: gp3
      fsType: ext4
      encrypted: "true"

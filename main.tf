@@ -71,19 +71,20 @@ provider "kubectl" {
   depends_on = [module.cluster]
 }
 
-resource "kubectl_manifest" "test" {
+resource "kubectl_manifest" "storageclass" {
     yaml_body = <<YAML
-kind: StorageClass
-apiVersion: storage.k8s.io/v1
-metadata:
-  name: gp3
-  annotations:
-    storageclass.kubernetes.io/is-default-class: "true"
-allowVolumeExpansion: true
-provisioner: ebs.csi.aws.com
-volumeBindingMode: WaitForFirstConsumer
-parameters:
-  type: gp3
+   apiVersion: storage.k8s.io/v1
+   kind: StorageClass
+   metadata:
+     name: ebs-sc
+   provisioner: ebs.csi.aws.com
+   parameters:
+     csi.storage.k8s.io/provisioner-secret-name: aws-secret
+     csi.storage.k8s.io/provisioner-secret-namespace: kube-system
+     type: gp2
+     fsType: ext4
+     encrypted: "true"
+     tags: "vkpr=true, terraform=true"  # Add tags here
 YAML
-depends_on = [module.kubectl]
+  depends_on = [module.kubectl]
 }

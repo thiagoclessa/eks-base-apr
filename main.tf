@@ -22,11 +22,6 @@ module "cluster" {
   aws_availability_zones    = try(local.config.aws_availability_zones, [""])
 }
    
-data "aws_eks_cluster" "cluster" {
-  name = local.config.cluster_name
-  depends_on = [module.cluster]  
-}
-
 data "aws_eks_cluster_auth" "cluster" {
   name = local.config.cluster_name
   depends_on = [module.cluster]  
@@ -43,6 +38,7 @@ resource "aws_iam_openid_connect_provider" "openid_connect" {
   url             = data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer
   depends_on = [module.cluster]  
 }
+
 
 module "irsa-ebs-csi" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
@@ -65,4 +61,27 @@ resource "aws_eks_addon" "ebs-csi" {
     "eks_addon" = "ebs-csi"
     "terraform" = "true"
   }
+}
+
+provider "kubectl" {
+  host                   = module.cluster.cluster_endpoint
+  cluster_ca_certificate = module.cluster.cluster_certificate_authority_data
+  token                  = module.cluster.kubeconfig_token
+  load_config_file       = false
+}
+
+resource "kubectl_manifest" "test" {
+    yaml_body = <<YAML
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: gp3
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+allowVolumeExpansion: true
+provisioner: ebs.csi.aws.com
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  type: gp3
+YAML
 }

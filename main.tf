@@ -2,11 +2,6 @@ data "aws_iam_policy" "ebs_csi_policy" {
   arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
 }
 
-data "aws_eks_cluster" "eks" {
-  name = local.config.cluster_name
-  depends_on = [module.cluster] 
-}
-
 module "cluster" {
   source  = "gitlab.com/vkpr/terraform-aws-eks/aws"
   version = "~> 1.3.0"
@@ -20,6 +15,11 @@ module "cluster" {
   tags                      = local.config.tags
   cluster_enabled_log_types = try(local.config.cluster_enabled_log_types, [""])
   aws_availability_zones    = try(local.config.aws_availability_zones, [""])
+}
+
+data "aws_eks_cluster" "cluster" {
+  name = local.config.cluster_name
+  depends_on = [module.cluster]  
 }
    
 data "aws_eks_cluster_auth" "cluster" {
